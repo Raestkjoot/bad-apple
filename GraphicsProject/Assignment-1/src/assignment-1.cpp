@@ -671,38 +671,6 @@ int main()
         // Unbind the vertex array
         glBindVertexArray(0);
 
-
-
-        // This is where the TestLine is initialized
-
-        // User data
-        std::vector<glm::vec3> TestLine;
-        TestLine = GenererateTestLine(xstart, ystart, xstop, ystop);
-
-        // Make a VertexArrayObject - it is used by the VertexArrayBuffer, and it must be declared!
-        GLuint TestLineVertexArrayID;
-        glGenVertexArrays(1, &TestLineVertexArrayID);
-        glBindVertexArray(TestLineVertexArrayID);
-
-        // Make a VertexBufferObject - it uses the previous VertexArrayBuffer!
-        GLuint testlinebuffer;
-        glGenBuffers(1, &testlinebuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, testlinebuffer);
-
-        // Supply the data to the GPU
-        if (TestLine.size() > 0) {
-            glBufferData(GL_ARRAY_BUFFER, TestLine.size() * sizeof(float) * 3, &(TestLine[0][0]), GL_STATIC_DRAW);
-        }
-
-        // Initialize grid Attributes
-        GLuint testlineattribute = glGetAttribLocation(lineshaderID, "VertexPosition");
-        glVertexAttribPointer(testlineattribute, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-        // Unbind the vertex array
-        glBindVertexArray(0);
-
-
-
         // This where the dots of the lines initialized
 
         // User data
@@ -785,26 +753,6 @@ int main()
                         glDrawArrays(GL_LINES, 0, GridLines.size());
                     }
                     glDisableVertexAttribArray(linearvertexattribute);
-                    glUseProgram(0);
-
-                    glUseProgram(lineshaderID);
-                    glUniform1f(linevertexscale, LineVertexScale);
-                    glUniform3f(linefragmentcolor, 1.0f, 1.0f, 1.0f);
-
-                    glBindVertexArray(TestLineVertexArrayID);
-                    glEnableVertexAttribArray(testlineattribute);
-                    if (CoordinatesChanged) {
-                        TestLine = GenererateTestLine(xstart, ystart, xstop, ystop);
-                        glBindBuffer(GL_ARRAY_BUFFER, testlinebuffer);
-                        if (TestLine.size() > 0) {
-                            glBufferData(GL_ARRAY_BUFFER, TestLine.size() * sizeof(float) * 3, &(TestLine[0][0]),
-                                GL_STATIC_DRAW);
-                        }
-                    }
-                    if (TestLine.size() > 0) {
-                        glDrawArrays(GL_LINES, 0, TestLine.size());
-                    }
-                    glDisableVertexAttribArray(testlineattribute);
                     glUseProgram(0);
 
                     glUseProgram(dotshaderID);

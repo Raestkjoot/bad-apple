@@ -71,6 +71,8 @@ int   NGridLines = glm::max(xmax, ymax) * 2 + 3;
 float PointSize = 1.0f;
 float LineVertexScale = 1.0f / (glm::max(xmax, ymax) + 2.0f);
 
+BadApple badApple(48, 36, shader_path + "Frames/frame");
+
 bool CoordinatesChanged = false;
 bool NeedsUpdate = true;
 
@@ -279,7 +281,7 @@ std::vector<glm::vec3> GenerateGridLines()
 std::vector<glm::vec3> GenerateFramePixels()
 {
     std::vector<glm::vec3> pixels;
-    BadApple badApple;
+    badApple.ReadFrameAndIncrement();
     pixels = badApple.GenerateFramePoints();
 
     return pixels;
@@ -345,7 +347,7 @@ int main()
 {
     try {
         // GLenum Error = GL_NO_ERROR;
-        #pragma region Initialization
+ #pragma region Initialization
 
 
         // Initialize glfw
@@ -664,6 +666,7 @@ int main()
                     glfwMakeContextCurrent(Window);
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+                    // Generate grid
                     glUseProgram(lineshaderID);
                     glUniform1f(linevertexscale, LineVertexScale);
                     glUniform3f(linefragmentcolor, 0.0f, 0.0f, 1.0f);
@@ -676,9 +679,9 @@ int main()
                     glDisableVertexAttribArray(linearvertexattribute);
                     glUseProgram(0);
 
+                    // Generate dots
                     glUseProgram(dotshaderID);
                     glUniform1f(dotvertexscale, LineVertexScale);
-                    // glUniform1f(dotvertexpointsize, 2.0f * PointSize);
                     glUniform1f(dotvertexpointsize, PointSize);
                     glUniform3f(dotfragmentcolor, 0.0f, 0.0f, 0.0f);
 
@@ -698,6 +701,7 @@ int main()
                     glDisableVertexAttribArray(dotvertexattribute);
                     glUseProgram(0);
 
+                    // Render frame
                     glfwSwapBuffers(Window);
 
                     CoordinatesChanged = false;

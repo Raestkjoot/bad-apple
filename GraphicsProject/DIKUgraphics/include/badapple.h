@@ -17,5 +17,32 @@
  */
 class BadApple {
 public:
+
+	BadApple(unsigned int rows, unsigned int cols, std::string filepath);
+
+	/**
+	 * Generate the points for the current frame.
+	 */
 	std::vector<glm::vec3> GenerateFramePoints();
+
+	/**
+	 * Read frame data from image at filepath and increment current frame ID.
+	 */
+	void ReadFrameAndIncrement();
+
+	/**
+	 * Set the general filepath for reading frames. "_<frame number>.bmp" will be added to this path.
+	 * \param filepath - The general filepath to the images. 
+	 */
+	void SetFilepath(const std::string& filepath);
+
+private:
+	unsigned char* ReadBMP(unsigned int frameID);
+
+	unsigned int rows;
+	unsigned int cols;
+	std::string filepath;
+
+	unsigned int currentFrameID;
+	unsigned char* currentFrameData;
 };

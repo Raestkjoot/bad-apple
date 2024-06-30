@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <chrono>
+
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -53,6 +55,7 @@ typedef unsigned int uint;
  * \param NeedsUpdate - true if the window needs to be updated - keypress or window resize,
  *                      false otherwize
  */
+// SETTINGS: grid
 int method = 1;
 int xmin = -24;
 int xmax = 24;
@@ -71,7 +74,13 @@ int   NGridLines = glm::max(xmax, ymax) * 2 + 3;
 float PointSize = 1.0f;
 float LineVertexScale = 1.0f / (glm::max(xmax, ymax) + 2.0f);
 
+// SETTINGS: Bad Apple variables
 BadApple badApple(48, 36, shader_path + "Frames/frame");
+double fps = 6.2;
+
+// runtime stuff
+std::chrono::time_point<std::chrono::steady_clock> loopStartTime, loopEndTime;
+std::chrono::duration<double, std::milli> timeSinceLastFrame;
 
 bool CoordinatesChanged = false;
 bool NeedsUpdate = true;
@@ -665,6 +674,7 @@ int main()
 
         while (!glfwWindowShouldClose(Window)) {
             try {
+                loopStartTime = std::chrono::steady_clock::now();
                 if (NeedsUpdate) {
                     glfwMakeContextCurrent(Window);
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -711,6 +721,14 @@ int main()
                     NeedsUpdate = false;
                 }
                 glfwPollEvents();
+
+                loopEndTime = std::chrono::steady_clock::now();
+                timeSinceLastFrame += loopEndTime - loopStartTime;
+                if (timeSinceLastFrame.count() >= 1000.0 / (fps)) {
+                    CoordinatesChanged = true;
+                    NeedsUpdate = true;
+                    timeSinceLastFrame = std::chrono::duration<double, std::milli>(0.0);
+                }
             }
             catch (std::exception& Exception) {
                 std::cerr << Exception.what() << std::endl;

@@ -346,7 +346,7 @@ void KeyboardCallback(GLFWwindow* Window, int key, int scancode, int action, int
             CoordinatesChanged = false;
             break;
         case GLFW_KEY_ENTER:
-            std::cout << "TODO: reset" << std::endl;
+            badApple.SetCurrentFrame(1u);
             break;
         }
 

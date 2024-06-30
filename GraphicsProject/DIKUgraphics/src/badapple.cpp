@@ -47,6 +47,11 @@ void BadApple::SetFilepath(const std::string& filepath)
     this->filepath = filepath;
 }
 
+void BadApple::SetCurrentFrame(unsigned int frameID)
+{
+    currentFrameID = frameID;
+}
+
 /*
  * Private functions
  */

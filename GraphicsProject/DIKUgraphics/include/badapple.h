@@ -33,9 +33,11 @@ public:
 
 	/**
 	 * Set the general filepath for reading frames. "_<frame number>.bmp" will be added to this path.
-	 * \param filepath - The general filepath to the images. 
+	 * \param filepath - The general filepath to the images.
 	 */
 	void SetFilepath(const std::string& filepath);
+
+	void SetCurrentFrame(unsigned int frameID);
 
 private:
 	unsigned char* ReadBMP(unsigned int frameID);

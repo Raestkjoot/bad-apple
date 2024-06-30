@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <limits>
 
 #include "traceinfo.h"
 #include "glmutils.h"
@@ -18,7 +19,7 @@
 class BadApple {
 public:
 
-	BadApple(unsigned int rows, unsigned int cols, std::string filepath);
+	BadApple(unsigned int width, unsigned int height, std::string filepath);
 
 	/**
 	 * Generate the points for the current frame.
@@ -39,8 +40,8 @@ public:
 private:
 	unsigned char* ReadBMP(unsigned int frameID);
 
-	unsigned int rows;
-	unsigned int cols;
+	unsigned int width;
+	unsigned int height;
 	std::string filepath;
 
 	unsigned int currentFrameID;

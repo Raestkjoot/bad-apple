@@ -284,6 +284,9 @@ std::vector<glm::vec3> GenerateFramePixels()
     badApple.ReadFrameAndIncrement();
     pixels = badApple.GenerateFramePoints();
 
+    CoordinatesChanged = true;
+    NeedsUpdate = true;
+
     return pixels;
 }
 

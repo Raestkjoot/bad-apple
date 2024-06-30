@@ -1,12 +1,14 @@
 #include "badapple.h"
 
-BadApple::BadApple(unsigned int rows, unsigned int cols, std::string filepath)
-    : rows(rows)
-    , cols(cols)
+BadApple::BadApple(unsigned int width, unsigned int height, std::string filepath)
+    : width(width)
+    , height(height)
     , filepath(filepath)
-    , currentFrameID(0)
+    , currentFrameID(1)
 {
 }
+
+int mul = 3; // The pixels in the bmp files are 3 bytes
 
 std::vector<glm::vec3> BadApple::GenerateFramePoints()
 {
@@ -18,12 +20,13 @@ std::vector<glm::vec3> BadApple::GenerateFramePoints()
         return points;
     }
 
-    glm::ivec2 centering(rows / 2, cols / 2);
+    glm::ivec2 centering(width / 2, height / 2);
 
-    for (int x = 0; x < rows; x++)
+    for (int y = 0; y < height; y++)
     {
-        for (int y = 0; y < cols; y++) {
-            if (currentFrameData[y * rows + x] == 'x') {
+        for (int x = 0; x < width; x++) {
+            unsigned char thisPixel = currentFrameData[(y * width + x) * mul];
+            if (thisPixel != UINT8_MAX) {
                 points.push_back(glm::vec3(x-centering.x, y-centering.y, 0.0f));
             }
         }
@@ -50,16 +53,17 @@ void BadApple::SetFilepath(const std::string& filepath)
 
 unsigned char* BadApple::ReadBMP(unsigned int frameID)
 {
-    unsigned int size = rows * cols;
-    // TODO read from filepath + '_' + frameID.tostring()
+    unsigned int size = width * height;
+    unsigned char* data = new unsigned char[size * mul];
 
-    // TODO: Do we need new here, since it's an array?
-    unsigned char* data = new unsigned char[size];
-
-    for (unsigned int i = 0; i < size; i++)
-    {
-        data[i] = 'x';
-    }
+    std::string thisPath = filepath + '_' + std::to_string(frameID) + ".bmp";
+    std::cout << "opening " << thisPath << std::endl;
+    FILE* fptr = fopen(thisPath.c_str(), "rb");
+    // skip the 54-byte header
+    fseek(fptr, 54, SEEK_SET);
+    // read image data
+    fread(data, sizeof(unsigned char) * mul, size, fptr);
+    fclose(fptr);
 
     return data;
 }

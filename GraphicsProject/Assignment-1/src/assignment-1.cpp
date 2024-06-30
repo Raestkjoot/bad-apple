@@ -14,6 +14,7 @@
 #include "ifile.h"
 #include "glmutils.h"
 #include "linerasterizer.h"
+#include "badapple.h"
 #include "shader_path.h"
 
 
@@ -268,25 +269,6 @@ std::vector<glm::vec3> GenerateGridLines()
 }
 
 /**
- * Creates a vector containing the start and stop points of a straight line
- * \param x1 - the x-coordinate of the start point.
- * \param y1 - the y-coordinate of the start point.
- * \param x2 - the x-coordinate of the end point.
- * \param y2 - the y-coordinate of the end point.
- * \return A std::vector which contains the coordinates of the start and stop points of a straight line.
- */
-std::vector<glm::vec3> GenererateTestLine(int xstart, int ystart, int xstop, int ystop)
-{
-    std::vector<glm::vec3> vertices;
-
-    vertices.push_back(glm::vec3(float(xstart), float(ystart), -0.1f));
-    vertices.push_back(glm::vec3(float(xstop), float(ystop), -0.1f));
-
-    return vertices;
-}
-
-
-/**
  * Scanconverts a straight line, i.e. computes the pixels that represents the approximated straight line.
  * \param x1 - the x-coordinate of the start point.
  * \param y1 - the y-coordinate of the start point.
@@ -294,75 +276,11 @@ std::vector<glm::vec3> GenererateTestLine(int xstart, int ystart, int xstop, int
  * \param y2 - the y-coordinate of the end point.
  * \return A std::vector which contains the coordinates of the pixels of a straight line.
  */
-std::vector<glm::vec3> GenerateLinePixels(int x1, int y1, int x2, int y2)
+std::vector<glm::vec3> GenerateFramePixels()
 {
     std::vector<glm::vec3> pixels;
-
-    if (::method == 2) {
-        LineRasterizer linerasterizer(x1, y1, x2, y2);
-
-        pixels = linerasterizer.AllFragments();
-    }
-    else {
-        ////////// METHOD=1 START ////////////////////
-        glm::vec3 startpoint = glm::vec3(float(x1), float(y1), 0.0f);
-        pixels.push_back(startpoint);
-
-        int x = x1;
-        int y = y1;
-
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-
-        int abs_2dx = std::abs(dx) << 1; // 2 * |dx|
-        int abs_2dy = std::abs(dy) << 1; // 2 * |dy|
-
-        int x_step = (dx < 0) ? -1 : 1;
-        int y_step = (dy < 0) ? -1 : 1;
-
-        bool x_dominant = (abs_2dx > abs_2dy);
-
-        if (x_dominant)
-        {
-            bool left_right = (x_step > 0);
-            int d = abs_2dy - (abs_2dx >> 1); // 2 * |dy| - |dx|
-
-            while (x != x2)
-            {
-                if ((d > 0) || ((d == 0) && left_right))
-                {
-                    y += y_step;
-                    d -= abs_2dx;
-                }
-                x += x_step;
-                d += abs_2dy;
-
-                glm::vec3 point(x, y, 0.0f);
-                pixels.push_back(point);
-            }
-        }
-        else // y_dominant
-        {
-            bool left_right = (y_step > 0);
-            int d = abs_2dx - (abs_2dy >> 1); // 2 * |dx| - |dy|
-
-            while (y != y2)
-            {
-                if ((d > 0) || ((d == 0) && left_right))
-                {
-                    x += x_step;
-                    d -= abs_2dy;
-                }
-                y += y_step;
-                d += abs_2dx;
-
-                glm::vec3 point(x, y, 0.0f);
-                pixels.push_back(point);
-            }
-        }
-
-    }
-    ////////// METHOD=1 END //////////////////////
+    BadApple badApple;
+    pixels = badApple.GenerateFramePoints();
 
     return pixels;
 }
@@ -427,6 +345,8 @@ int main()
 {
     try {
         // GLenum Error = GL_NO_ERROR;
+        #pragma region Initialization
+
 
         // Initialize glfw
         if (!glfwInit()) {
@@ -674,8 +594,8 @@ int main()
         // This where the dots of the lines initialized
 
         // User data
-        std::vector<glm::vec3> LinePixels;
-        LinePixels = GenerateLinePixels(xstart, ystart, xstop, ystop);
+        std::vector<glm::vec3> FramePixels;
+        FramePixels = GenerateFramePixels();
         //std::cout << LinePixels << std::endl;
 
         // Make a VertexArrayObject - it is used by the VertexArrayBuffer, and it must be declared!
@@ -689,8 +609,8 @@ int main()
         glBindBuffer(GL_ARRAY_BUFFER, dotvertexbuffer);
 
         // Give our vertices to OpenGL.
-        if (LinePixels.size() > 0) {
-            glBufferData(GL_ARRAY_BUFFER, LinePixels.size() * sizeof(float) * 3, &(LinePixels[0][0]), GL_STATIC_DRAW);
+        if (FramePixels.size() > 0) {
+            glBufferData(GL_ARRAY_BUFFER, FramePixels.size() * sizeof(float) * 3, &(FramePixels[0][0]), GL_STATIC_DRAW);
         }
 
         // Validate the dot shader program
@@ -736,6 +656,7 @@ int main()
         std::cout << "* Press ESC to finish the program                                    *" << std::endl;
         std::cout << "**********************************************************************" << std::endl;
         std::cout << std::endl;
+        #pragma endregion
 
         while (!glfwWindowShouldClose(Window)) {
             try {
@@ -764,15 +685,15 @@ int main()
                     glBindVertexArray(PixelVertexArrayID);
                     glEnableVertexAttribArray(dotvertexattribute);
                     if (CoordinatesChanged) {
-                        LinePixels = GenerateLinePixels(xstart, ystart, xstop, ystop);
+                        FramePixels = GenerateFramePixels();
                         glBindBuffer(GL_ARRAY_BUFFER, dotvertexbuffer);
-                        if (LinePixels.size() > 0) {
-                            glBufferData(GL_ARRAY_BUFFER, LinePixels.size() * sizeof(float) * 3, &(LinePixels[0][0]),
+                        if (FramePixels.size() > 0) {
+                            glBufferData(GL_ARRAY_BUFFER, FramePixels.size() * sizeof(float) * 3, &(FramePixels[0][0]),
                                 GL_STATIC_DRAW);
                         }
                     }
-                    if (LinePixels.size() > 0) {
-                        glDrawArrays(GL_POINTS, 0, LinePixels.size());
+                    if (FramePixels.size() > 0) {
+                        glDrawArrays(GL_POINTS, 0, FramePixels.size());
                     }
                     glDisableVertexAttribArray(dotvertexattribute);
                     glUseProgram(0);

@@ -395,37 +395,6 @@ void ResizeCallback(GLFWwindow* Window, int width, int height)
 }
 
 /**
- * Change the coordinates of a vertex depending on the arrow key and the modifier key
- * \param x - the x-coordinate of the vertex
- * \param y - the y-coordinate of the vertex
- * \param key - the arrow key that was pressed
- * \return x - there is no actual return value but the x-parameter is modified according to the key-value
- * \return y - there is no actual return value but the y-parameter is modified according to the key-value
- */
-void ChangeVertex(int& x, int& y, int key)
-{
-    switch (key) {
-    case GLFW_KEY_RIGHT:
-        ++x;
-        if (x > xmax) x = xmax;
-        break;
-    case GLFW_KEY_UP:
-        ++y;
-        if (y > ymax) y = ymax;
-        break;
-    case GLFW_KEY_LEFT:
-        --x;
-        if (x < xmin) x = xmin;
-        break;
-    case GLFW_KEY_DOWN:
-        --y;
-        if (y < ymin) y = ymin;
-    }
-    CoordinatesChanged = true;
-    NeedsUpdate = true;
-}
-
-/**
  * Callback function for keyboard shortcuts
  * \param Window - the window that created the callback
  * \param key - The key code
@@ -438,29 +407,19 @@ void KeyboardCallback(GLFWwindow* Window, int key, int scancode, int action, int
     if (action == GLFW_RELEASE) return;
 
     if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_ESCAPE) {
+        switch (key)
+        {
+        case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(Window, GL_TRUE);
             CoordinatesChanged = false;
-        }
-        else {
-            switch (key) {
-            case '1':
-                ::method = 1;
-                std::cout << "Use Function" << std::endl;
-                break;
-            case '2':
-                ::method = 2;
-                std::cout << "Use LineRasterizer" << std::endl;
-                break;
-            }
-        }
-        switch (mode) {
-        case GLFW_MOD_SHIFT:
-            ChangeVertex(xstart, ystart, key);
             break;
-        default:
-            ChangeVertex(xstop, ystop, key);
+        case GLFW_KEY_ENTER:
+            std::cout << "TODO: reset" << std::endl;
+            break;
         }
+
+        CoordinatesChanged = true;
+        NeedsUpdate = true;
     }
 }
 
@@ -805,7 +764,7 @@ int main()
         std::cout << "**********************************************************************" << std::endl;
         std::cout << "* Bad Apple Music Video in DIKU's Graphics Programming Framework     *" << std::endl;
         std::cout << "*                                                                    *" << std::endl;
-        std::cout << "* Press 1 to reset                                                   *" << std::endl;
+        std::cout << "* Press ENTER to reset                                               *" << std::endl;
         std::cout << "* Press ESC to finish the program                                    *" << std::endl;
         std::cout << "**********************************************************************" << std::endl;
         std::cout << std::endl;

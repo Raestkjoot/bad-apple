@@ -1,3 +1,6 @@
+# Result:
+https://youtu.be/Xab27q_Kjf0?si=NbeftTg-2txTXPJ_
+
 # Bad Apple with DIKU's framework for the Computer Graphics Course
 DIKU's programming framework for the Computer Graphics course is available here: 
 https://github.com/diku-dk/ComputerGrafikProjektStudents
